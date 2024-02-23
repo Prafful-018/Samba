@@ -1,0 +1,171 @@
+login as: prafful
+prafful@192.168.29.238's password:
+Activate the web console with: systemctl enable --now cockpit.socket
+
+Last login: Fri Feb 23 20:26:45 2024 from 192.168.29.87
+[prafful@MyLinuxVM ~]$
+[prafful@MyLinuxVM ~]$ su -
+Password:
+[root@MyLinuxVM ~]#
+[root@MyLinuxVM ~]# yum install samba samba-client samba-common
+Last metadata expiration check: 1:10:51 ago on Fri 23 Feb 2024 07:48:46 PM IS
+Package samba-common-4.19.4-3.el8.noarch is already installed.
+Dependencies resolved.
+=============================================================================
+ Package                                         Architecture
+=============================================================================
+Installing:
+ samba                                           x86_64
+ samba-client                                    x86_64
+Installing dependencies:
+ libnetapi                                       x86_64
+ samba-common-tools                              x86_64
+ samba-dcerpc                                    x86_64
+ samba-ldb-ldap-modules                          x86_64
+ samba-libs                                      x86_64
+
+Transaction Summary
+=============================================================================
+Install  7 Packages
+
+Total download size: 3.6 M
+Installed size: 11 M
+Is this ok [y/N]: y
+Downloading Packages:
+(1/7): libnetapi-4.19.4-3.el8.x86_64.rpm
+(2/7): samba-common-tools-4.19.4-3.el8.x86_64.rpm
+(3/7): samba-4.19.4-3.el8.x86_64.rpm
+(4/7): samba-client-4.19.4-3.el8.x86_64.rpm
+(5/7): samba-libs-4.19.4-3.el8.x86_64.rpm
+(6/7): samba-ldb-ldap-modules-4.19.4-3.el8.x86_64.rpm
+(7/7): samba-dcerpc-4.19.4-3.el8.x86_64.rpm
+-----------------------------------------------------------------------------
+Total
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Preparing        :
+  Installing       : samba-libs-4.19.4-3.el8.x86_64
+  Installing       : libnetapi-4.19.4-3.el8.x86_64
+  Installing       : samba-dcerpc-4.19.4-3.el8.x86_64
+  Installing       : samba-ldb-ldap-modules-4.19.4-3.el8.x86_64
+  Installing       : samba-common-tools-4.19.4-3.el8.x86_64
+  Installing       : samba-4.19.4-3.el8.x86_64
+  Running scriptlet: samba-4.19.4-3.el8.x86_64
+  Installing       : samba-client-4.19.4-3.el8.x86_64
+  Running scriptlet: samba-client-4.19.4-3.el8.x86_64
+  Verifying        : libnetapi-4.19.4-3.el8.x86_64
+  Verifying        : samba-4.19.4-3.el8.x86_64
+  Verifying        : samba-client-4.19.4-3.el8.x86_64
+  Verifying        : samba-common-tools-4.19.4-3.el8.x86_64
+  Verifying        : samba-dcerpc-4.19.4-3.el8.x86_64
+  Verifying        : samba-ldb-ldap-modules-4.19.4-3.el8.x86_64
+  Verifying        : samba-libs-4.19.4-3.el8.x86_64
+
+Installed:
+  libnetapi-4.19.4-3.el8.x86_64      samba-4.19.4-3.el8.x86_64
+  samba-dcerpc-4.19.4-3.el8.x86_64   samba-ldb-ldap-modules-4.19.4-3.el8.x86_
+
+Complete!
+[root@MyLinuxVM ~]# systemctl disable firewalld
+[root@MyLinuxVM ~]# systemctl stop firewalld
+[root@MyLinuxVM ~]# mkdir -p /samba/newfolder2
+[root@MyLinuxVM ~]# chmod a+rwx /samba/newfolder2/
+[root@MyLinuxVM ~]# chown -R nobody:nobody /samba/
+[root@MyLinuxVM ~]#
+[root@MyLinuxVM ~]#
+[root@MyLinuxVM ~]# SELinux status
+bash: SELinux: command not found...
+[root@MyLinuxVM ~]# sestatus
+SELinux status:                 enabled
+SELinuxfs mount:                /sys/fs/selinux
+SELinux root directory:         /etc/selinux
+Loaded policy name:             targeted
+Current mode:                   enforcing
+Mode from config file:          enforcing
+Policy MLS status:              enabled
+Policy deny_unknown status:     allowed
+Memory protection checking:     actual (secure)
+Max kernel policy version:      33
+[root@MyLinuxVM ~]#
+[root@MyLinuxVM ~]# vi /etc/selinux/config
+[root@MyLinuxVM ~]#
+[root@MyLinuxVM ~]# reboot
+login as: prafful
+prafful@192.168.29.238's password:
+Activate the web console with: systemctl enable --now cockpit.socket
+
+Last login: Fri Feb 23 20:58:16 2024 from 192.168.29.87
+[prafful@MyLinuxVM ~]$ su -
+Password:
+[root@MyLinuxVM ~]#
+[root@MyLinuxVM ~]# cd /etc/samba/
+[root@MyLinuxVM samba]# ll
+total 20
+-rw-r--r--. 1 root root    20 Jan 18 16:59 lmhosts
+-rw-r--r--. 1 root root   940 Jan 18 16:59 smb.conf
+-rw-r--r--. 1 root root 11319 Jan 18 16:59 smb.conf.example
+[root@MyLinuxVM samba]# vi smb.conf
+[root@MyLinuxVM samba]# cat smb.conf
+# See smb.conf.example for a more detailed config file or
+# read the smb.conf manpage.
+# Run 'testparm' to verify the config is correct after
+# you modified it.
+#
+# Note:
+# SMB1 is disabled by default. This means clients without support for SMB2 or
+# SMB3 are no longer able to connect to smbd (by default).
+
+[global]
+        workgroup = WORKGROUP
+        netbios name = centos
+        security = user
+        map to guest = bad user
+        dns proxy = no
+
+[Anonymous]
+        path = /samba/newfolder2
+        browsable = yes
+        writable = yes
+        guest ok = yes
+        guest only = yes
+        read only = no
+[root@MyLinuxVM samba]# testparm
+Load smb config files from /etc/samba/smb.conf
+Loaded services file OK.
+Weak crypto is allowed by GnuTLS (e.g. NTLM as a compatibility fallback)
+
+Server role: ROLE_STANDALONE
+
+Press enter to see a dump of your service definitions
+
+# Global parameters
+[global]
+        dns proxy = No
+        map to guest = Bad User
+        netbios name = CENTOS
+        security = USER
+        idmap config * : backend = tdb
+
+
+[Anonymous]
+        guest ok = Yes
+        guest only = Yes
+        path = /samba/newfolder2
+        read only = No
+[root@MyLinuxVM samba]# systemctl enable smb.service
+Created symlink /etc/systemd/system/multi-user.target.wants/smb.service → /us
+[root@MyLinuxVM samba]# systemctl enable nmb.service
+Created symlink /etc/systemd/system/multi-user.target.wants/nmb.service → /us
+[root@MyLinuxVM samba]# systemctl start nmb.service
+[root@MyLinuxVM samba]# systemctl start smb.service
+[root@MyLinuxVM samba]#
+[root@MyLinuxVM samba]# cd /samba/newfolder2/
+[root@MyLinuxVM newfolder2]# touch abc
+[root@MyLinuxVM newfolder2]# touch hello
+[root@MyLinuxVM newfolder2]# touch hi.html
+[root@MyLinuxVM newfolder2]# touch hi.txt
+[root@MyLinuxVM newfolder2]#
+
